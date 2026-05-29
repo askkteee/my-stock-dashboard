@@ -5,7 +5,25 @@ from data_collector import (
     get_realtime_news, get_market_summary, get_watch_list_data, get_macro_indicators, get_stock_name
 )
 
+# PC/모바일 반응형 레이아웃 설정
 st.set_page_config(page_title="실시간 국내 증시 대시보드", page_icon="📈", layout="wide")
+
+# 📱 [NEW] 모바일 화면 최적화를 위한 CSS 여백 축소 마법
+st.markdown("""
+<style>
+/* 전체 화면 좌우 상하 여백을 모바일에 맞게 확 줄여줍니다 */
+.block-container {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+}
+/* 표(데이터프레임) 글자 크기를 모바일에서도 보기 좋게 살짝 조정합니다 */
+div[data-testid="stDataFrame"] {
+    font-size: 14px;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # 🎨 데이터 색상 지정 함수 (HTS 스타일)
 def color_positive_negative(val):
@@ -56,7 +74,8 @@ with col_left:
     theme_df = get_naver_theme_top4()
     
     if not theme_df.empty:
-        st.dataframe(theme_df[['순위', '테마명', '평균 등락률(%)']], hide_index=True)
+        # 📱 [NEW] use_container_width=True 적용
+        st.dataframe(theme_df[['순위', '테마명', '평균 등락률(%)']], hide_index=True, use_container_width=True)
         st.markdown("👇 **테마별 주도주(대장주) 분석하기**")
         selected_theme = st.selectbox("스크리너에 연동할 테마를 선택하세요:", theme_df['테마명'])
         
@@ -92,7 +111,8 @@ with tab1:
         except:
             styled_df = screener_df.style.applymap(color_positive_negative, subset=['등락률', '외국인', '기관계'])
             
-        st.dataframe(styled_df, hide_index=True)
+        # 📱 [NEW] use_container_width=True 적용
+        st.dataframe(styled_df, hide_index=True, use_container_width=True)
     else:
         st.info("분석할 테마 대장주 정보가 없습니다.")
 
@@ -117,7 +137,8 @@ with tab2:
                 except:
                     styled_custom_df = custom_df.style.applymap(color_positive_negative, subset=['등락률', '외국인', '기관계'])
                     
-                st.dataframe(styled_custom_df, hide_index=True)
+                # 📱 [NEW] use_container_width=True 적용
+                st.dataframe(styled_custom_df, hide_index=True, use_container_width=True)
         else:
             st.warning("올바른 6자리 숫자 종목코드를 입력해 주세요.")
 
@@ -125,6 +146,7 @@ with tab3:
     st.markdown("**네이버 금융 실시간 주요 뉴스 (클릭 시 이동)**")
     try:
         news_df = get_realtime_news()
-        st.dataframe(news_df, hide_index=True, column_config={"링크": st.column_config.LinkColumn("기사 읽기")})
+        # 📱 [NEW] use_container_width=True 적용
+        st.dataframe(news_df, hide_index=True, use_container_width=True, column_config={"링크": st.column_config.LinkColumn("기사 읽기")})
     except:
         st.error("뉴스 데이터를 불러오지 못했습니다.")
